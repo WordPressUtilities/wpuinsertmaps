@@ -1,0 +1,8 @@
+@charset "UTF-8";
+
+.wpuinsertmaps-element {
+    z-index: 1;
+    position: relative;
+    height: 0;
+    padding-top: 300px;
+}
