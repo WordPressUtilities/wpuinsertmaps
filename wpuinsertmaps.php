@@ -3,7 +3,7 @@
 /*
 Plugin Name: WPU Insert Maps
 Description: Insert a Google Map to a page - Requires WPU Options & WPU Post Metas
-Version: 0.1.0
+Version: 0.1.1
 Author: Darklg
 Author URI: http://darklg.me/
 License: MIT License
@@ -24,7 +24,7 @@ class WPUInsertMaps {
         add_action('wp_footer', array(&$this, 'load_apikey'));
 
         /* Load content */
-        add_filter('the_content', array(&$this, 'load_map'), 10, 2);
+        add_filter('the_content', array(&$this, 'load_map'));
     }
 
     /* ----------------------------------------------------------
@@ -93,24 +93,28 @@ class WPUInsertMaps {
     -------------------------- */
 
     public function add_theme_scripts() {
-        wp_enqueue_style( 'wpuinsertmaps-style', plugins_url('assets/style.css', __FILE__));
-        wp_enqueue_script('wpuinsertmaps-script', plugins_url('assets/script.js', __FILE__), array('jquery'), 1.1, true);
+        if (is_singular()) {
+            wp_enqueue_style('wpuinsertmaps-style', plugins_url('assets/style.css', __FILE__));
+            wp_enqueue_script('wpuinsertmaps-script', plugins_url('assets/script.js', __FILE__), array('jquery'), 1.1, true);
+        }
     }
 
     /* Load api key
     -------------------------- */
 
-    function load_apikey(){
-        echo '<script src="https://maps.googleapis.com/maps/api/js?key='.get_option('wpuinsertmaps__key').'&callback=wpuinsertmaps_init"async defer></script>';
+    public function load_apikey() {
+        if (is_singular()) {
+            echo '<script src="https://maps.googleapis.com/maps/api/js?key=' . get_option('wpuinsertmaps__key') . '&callback=wpuinsertmaps_init"async defer></script>';
+        }
     }
 
     /* Load map in content
     -------------------------- */
 
-    public function load_map($content, $post_id) {
-        if (get_post_meta(get_the_ID(), 'wpuinsertmaps__load_map', 1)) {
-            $wputh_post_address = get_post_meta(get_the_ID(), 'wputh_post_address', 1);
-            $content .= '<div class="wpuinsertmaps-element" data-map="' . esc_attr(json_encode($wputh_post_address)) . '"></div>';
+    public function load_map($content) {
+        if (is_singular() && is_main_query() && get_post_meta(get_the_ID(), 'wpuinsertmaps__load_map', 1)) {
+            $wputh_post_address = json_encode(get_post_meta(get_the_ID(), 'wputh_post_address', 1));
+            $content .= '<div class="wpuinsertmaps-element" data-map="' . esc_attr($wputh_post_address) . '"></div>';
         }
         return $content;
     }
