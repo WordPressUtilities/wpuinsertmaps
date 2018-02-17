@@ -3,7 +3,7 @@
 /*
 Plugin Name: WPU Insert Maps
 Description: Insert a Google Map to a page - Requires WPU Options & WPU Post Metas
-Version: 0.1.1
+Version: 0.2.0
 Author: Darklg
 Author URI: http://darklg.me/
 License: MIT License
@@ -12,6 +12,8 @@ License URI: http://opensource.org/licenses/MIT
 
 class WPUInsertMaps {
     public function __construct() {
+        add_action('plugins_loaded', array(&$this, 'load_translation'));
+
         /* Boxes */
         add_filter('wpu_options_tabs', array(&$this, 'set_wpu_options_tabs'), 10, 1);
         add_filter('wpu_options_boxes', array(&$this, 'set_wpu_options_boxes'), 10, 1);
@@ -25,6 +27,10 @@ class WPUInsertMaps {
 
         /* Load content */
         add_filter('the_content', array(&$this, 'load_map'));
+    }
+
+    public function load_translation() {
+        load_plugin_textdomain('wpuinsertmaps', false, dirname(plugin_basename(__FILE__)) . '/lang/');
     }
 
     /* ----------------------------------------------------------
@@ -52,7 +58,8 @@ class WPUInsertMaps {
     public function set_wputh_options_fields($options) {
         $options['wpuinsertmaps__key'] = array(
             'label' => __('Maps API Key', 'wpuinsertmaps'),
-            'box' => 'wpuinsertmaps__box'
+            'box' => 'wpuinsertmaps__box',
+            'help' => sprintf(__('You can get an <a %s href="%s">API key here</a>'), 'target="_blank"', 'https://console.developers.google.com/apis/library/maps-backend.googleapis.com/?project=')
         );
         return $options;
     }
@@ -72,15 +79,25 @@ class WPUInsertMaps {
         $fields['wpuinsertmaps__load_map'] = array(
             'box' => 'wpuinsertmaps__meta_box',
             'type' => 'checkbox',
-            'name' => 'Display map'
+            'name' => __('Display map', 'wpuinsertmaps')
         );
         $fields['wputh_post_address'] = array(
             'box' => 'wpuinsertmaps__meta_box',
             'type' => 'table',
             'columns' => array(
-                'name' => array('type' => 'text', 'name' => 'Name'),
-                'lat' => array('type' => 'text', 'name' => 'Latitude'),
-                'lng' => array('type' => 'text', 'name' => 'Longitude')
+                'name' => array('type' => 'text', 'name' => __('Name', 'wpuinsertmaps')),
+                'lat' => array('type' => 'text', 'name' => __('Latitude', 'wpuinsertmaps')),
+                'lng' => array('type' => 'text', 'name' => __('Longitude', 'wpuinsertmaps')),
+                'iconType' => array('type' => 'select', 'name' => __('Color', 'wpuinsertmaps'), 'datas' => array(
+                    'red' => __('Red', 'wpuinsertmaps'),
+                    'yellow' => __('Yellow', 'wpuinsertmaps'),
+                    'blue' => __('Blue', 'wpuinsertmaps'),
+                    'green' => __('Green', 'wpuinsertmaps'),
+                    'ltblue' => __('Light blue', 'wpuinsertmaps'),
+                    'orange' => __('Orange', 'wpuinsertmaps'),
+                    'pink' => __('Pink', 'wpuinsertmaps'),
+                    'purple' => __('Purple', 'wpuinsertmaps')
+                ))
             )
         );
         return $fields;

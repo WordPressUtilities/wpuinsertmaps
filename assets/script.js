@@ -19,16 +19,35 @@ function wpuinsertmaps_load($el) {
     }
     var latlngbounds = new google.maps.LatLngBounds(),
         infoWindow = new google.maps.InfoWindow(),
+        mapCenter = {
+            lat: parseFloat(markers[0].lat, 10),
+            lng: parseFloat(markers[0].lng, 10)
+        },
         map = new google.maps.Map($el, {
-            center: {
-                lat: parseFloat(markers[0].lat, 10),
-                lng: parseFloat(markers[0].lng, 10)
-            },
+            center: mapCenter,
             zoom: 8
         });
 
     // Insert each marker
     for (var i in markers) {
+        if (markers[i].iconType) {
+            switch (markers[i].iconType) {
+                case 'yellow':
+                case 'blue':
+                case 'green':
+                case 'ltblue':
+                case 'orange':
+                case 'pink':
+                case 'purple':
+                    markers[i].icon = 'https://maps.google.com/mapfiles/ms/micons/' + markers[i].iconType + '-dot.png';
+                    break;
+                default:
+
+            }
+        }
+        if (!markers[i].description) {
+            markers[i].description = "<a target='_blank' style='text-decoration:underline;' href='https://www.google.fr/maps?q=" + markers[i].lat + "," + markers[i].lng + "'>" + markers[i].name + "</a>";
+        }
         wpuinsertmaps_marker(markers[i], map, infoWindow, latlngbounds);
     }
 
@@ -46,18 +65,32 @@ function wpuinsertmaps_load($el) {
  */
 function wpuinsertmaps_marker(data, map, infoWindow, latlngbounds) {
     var myLatlng = new google.maps.LatLng(data.lat, data.lng),
-        marker = new google.maps.Marker({
+        markerInfo = {
             map: map,
             position: myLatlng,
             title: data.name
-        });
+        },
+        marker;
+
+    if (data.icon) {
+        markerInfo.icon = data.icon;
+    }
+
+    marker = new google.maps.Marker(markerInfo);
 
     // Add an infoWindow when click happens
-    google.maps.event.addListener(marker, "click", function(e) {
-        infoWindow.setContent("<div><a target='_blank' style='text-decoration:underline;' href='https://www.google.fr/maps?q=" + data.lat + "," + data.lng + "'>" + data.name + "</a></div>");
-        infoWindow.open(map, marker);
-    });
+    if (data.description) {
+        if (!infoWindow) {
+            infoWindow = new google.maps.InfoWindow();
+        }
+        google.maps.event.addListener(marker, "click", function() {
+            infoWindow.setContent("<div>" + data.description + "</div>");
+            infoWindow.open(map, marker);
+        });
+    }
 
     // Extend bounds to the marker position
-    latlngbounds.extend(marker.position);
+    if (latlngbounds) {
+        latlngbounds.extend(marker.position);
+    }
 }
