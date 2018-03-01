@@ -3,7 +3,7 @@
 /*
 Plugin Name: WPU Insert Maps
 Description: Insert a Google Map to a page - Requires WPU Options & WPU Post Metas
-Version: 0.2.0
+Version: 0.3.0
 Author: Darklg
 Author URI: http://darklg.me/
 License: MIT License
@@ -11,6 +11,8 @@ License URI: http://opensource.org/licenses/MIT
 */
 
 class WPUInsertMaps {
+    private $version = '0.3.0';
+
     public function __construct() {
         add_action('plugins_loaded', array(&$this, 'load_translation'));
 
@@ -36,6 +38,7 @@ class WPUInsertMaps {
     /* ----------------------------------------------------------
       Admin
     ---------------------------------------------------------- */
+
     /* Options
     -------------------------- */
 
@@ -84,10 +87,13 @@ class WPUInsertMaps {
         $fields['wputh_post_address'] = array(
             'box' => 'wpuinsertmaps__meta_box',
             'type' => 'table',
+            'table_maxline' => 99,
+            'name' => __('Markers', 'wpuinsertmaps'),
             'columns' => array(
                 'name' => array('type' => 'text', 'name' => __('Name', 'wpuinsertmaps')),
                 'lat' => array('type' => 'text', 'name' => __('Latitude', 'wpuinsertmaps')),
                 'lng' => array('type' => 'text', 'name' => __('Longitude', 'wpuinsertmaps')),
+                'link' => array('type' => 'url', 'name' => __('URL', 'wpuinsertmaps')),
                 'iconType' => array('type' => 'select', 'name' => __('Color', 'wpuinsertmaps'), 'datas' => array(
                     'red' => __('Red', 'wpuinsertmaps'),
                     'yellow' => __('Yellow', 'wpuinsertmaps'),
@@ -111,8 +117,8 @@ class WPUInsertMaps {
 
     public function add_theme_scripts() {
         if (is_singular()) {
-            wp_enqueue_style('wpuinsertmaps-style', plugins_url('assets/style.css', __FILE__));
-            wp_enqueue_script('wpuinsertmaps-script', plugins_url('assets/script.js', __FILE__), array('jquery'), 1.1, true);
+            wp_enqueue_style('wpuinsertmaps-style', plugins_url('assets/style.css', __FILE__), array(), $this->version);
+            wp_enqueue_script('wpuinsertmaps-script', plugins_url('assets/script.js', __FILE__), array('jquery'), $this->version, true);
         }
     }
 

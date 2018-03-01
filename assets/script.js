@@ -26,7 +26,8 @@ function wpuinsertmaps_load($el) {
         map = new google.maps.Map($el, {
             center: mapCenter,
             zoom: 8
-        });
+        }),
+        tmpLink;
 
     // Insert each marker
     for (var i in markers) {
@@ -42,11 +43,14 @@ function wpuinsertmaps_load($el) {
                     markers[i].icon = 'https://maps.google.com/mapfiles/ms/micons/' + markers[i].iconType + '-dot.png';
                     break;
                 default:
-
             }
         }
+        tmpLink = "https://www.google.fr/maps?q=" + markers[i].lat + "," + markers[i].lng;
+        if (markers[i].link) {
+            tmpLink = markers[i].link;
+        }
         if (!markers[i].description) {
-            markers[i].description = "<a target='_blank' style='text-decoration:underline;' href='https://www.google.fr/maps?q=" + markers[i].lat + "," + markers[i].lng + "'>" + markers[i].name + "</a>";
+            markers[i].description = "<a target='_blank' style='text-decoration:underline;' href='" + tmpLink + "'>" + markers[i].name + "</a>";
         }
         wpuinsertmaps_marker(markers[i], map, infoWindow, latlngbounds);
     }
