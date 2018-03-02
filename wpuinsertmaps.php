@@ -3,7 +3,7 @@
 /*
 Plugin Name: WPU Insert Maps
 Description: Insert a Google Map to a page - Requires WPU Options & WPU Post Metas
-Version: 0.3.0
+Version: 0.4.0
 Author: Darklg
 Author URI: http://darklg.me/
 License: MIT License
@@ -11,7 +11,7 @@ License URI: http://opensource.org/licenses/MIT
 */
 
 class WPUInsertMaps {
-    private $version = '0.3.0';
+    private $version = '0.4.0';
 
     public function __construct() {
         add_action('plugins_loaded', array(&$this, 'load_translation'));
@@ -84,7 +84,16 @@ class WPUInsertMaps {
             'type' => 'checkbox',
             'name' => __('Display map', 'wpuinsertmaps')
         );
-        $fields['wputh_post_address'] = array(
+        $fields['wpuinsertmaps__map_position'] = array(
+            'box' => 'wpuinsertmaps__meta_box',
+            'type' => 'select',
+            'name' => __('Position', 'wpuinsertmaps'),
+            'datas' => array(
+                'under' => __('Under Content', 'wpuinsertmaps'),
+                'over' => __('Over Content', 'wpuinsertmaps')
+            )
+        );
+        $fields['wpuinsertmaps__markers'] = array(
             'box' => 'wpuinsertmaps__meta_box',
             'type' => 'table',
             'table_maxline' => 99,
@@ -136,8 +145,14 @@ class WPUInsertMaps {
 
     public function load_map($content) {
         if (is_singular() && is_main_query() && get_post_meta(get_the_ID(), 'wpuinsertmaps__load_map', 1)) {
-            $wputh_post_address = json_encode(get_post_meta(get_the_ID(), 'wputh_post_address', 1));
-            $content .= '<div class="wpuinsertmaps-element" data-map="' . esc_attr($wputh_post_address) . '"></div>';
+            $wpuinsertmaps__markers = json_encode(get_post_meta(get_the_ID(), 'wpuinsertmaps__markers', 1));
+            $wpuinsertmaps__map_position = get_post_meta(get_the_ID(), 'wpuinsertmaps__map_position', 1);
+            $content_map = '<div class="wpuinsertmaps-element" data-map="' . esc_attr($wpuinsertmaps__markers) . '"></div>';
+            if ($wpuinsertmaps__map_position == 'over') {
+                $content = $content_map . $content;
+            } else {
+                $content .= $content_map;
+            }
         }
         return $content;
     }

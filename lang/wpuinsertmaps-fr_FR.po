@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WPU Insert Maps\n"
-"POT-Creation-Date: 2018-03-01 14:35+0100\n"
+"POT-Creation-Date: 2018-03-02 23:13+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Darklg <darklg.blog@gmail.com>\n"
 "Language-Team: \n"
@@ -36,58 +36,70 @@ msgstr "Vous pouvez obtenir une <a %s href=\"%s\">clé API ici</a>"
 msgid "Display map"
 msgstr "Afficher la carte"
 
-#: .././wpuinsertmaps.php:91
+#: .././wpuinsertmaps.php:90
+msgid "Position"
+msgstr "Position"
+
+#: .././wpuinsertmaps.php:92
+msgid "Under Content"
+msgstr "Après le contenu"
+
+#: .././wpuinsertmaps.php:93
+msgid "Over Content"
+msgstr "Avant le contenu"
+
+#: .././wpuinsertmaps.php:100
 msgid "Markers"
 msgstr "Marqueurs"
 
-#: .././wpuinsertmaps.php:93
+#: .././wpuinsertmaps.php:102
 msgid "Name"
 msgstr "Nom"
 
-#: .././wpuinsertmaps.php:94
+#: .././wpuinsertmaps.php:103
 msgid "Latitude"
 msgstr "Latitude"
 
-#: .././wpuinsertmaps.php:95
+#: .././wpuinsertmaps.php:104
 msgid "Longitude"
 msgstr "Longitude"
 
-#: .././wpuinsertmaps.php:96
+#: .././wpuinsertmaps.php:105
 msgid "URL"
 msgstr "URL"
 
-#: .././wpuinsertmaps.php:97
+#: .././wpuinsertmaps.php:106
 msgid "Color"
 msgstr "Couleur"
 
-#: .././wpuinsertmaps.php:98
+#: .././wpuinsertmaps.php:107
 msgid "Red"
 msgstr "Rouge"
 
-#: .././wpuinsertmaps.php:99
+#: .././wpuinsertmaps.php:108
 msgid "Yellow"
 msgstr "Jaune"
 
-#: .././wpuinsertmaps.php:100
+#: .././wpuinsertmaps.php:109
 msgid "Blue"
 msgstr "Bleu"
 
-#: .././wpuinsertmaps.php:101
+#: .././wpuinsertmaps.php:110
 msgid "Green"
 msgstr "Vert"
 
-#: .././wpuinsertmaps.php:102
+#: .././wpuinsertmaps.php:111
 msgid "Light blue"
 msgstr "Bleu pâle"
 
-#: .././wpuinsertmaps.php:103
+#: .././wpuinsertmaps.php:112
 msgid "Orange"
 msgstr "Orange"
 
-#: .././wpuinsertmaps.php:104
+#: .././wpuinsertmaps.php:113
 msgid "Pink"
 msgstr "Rose"
 
-#: .././wpuinsertmaps.php:105
+#: .././wpuinsertmaps.php:114
 msgid "Purple"
 msgstr "Violet"
