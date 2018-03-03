@@ -3,7 +3,7 @@
 /*
 Plugin Name: WPU Insert Maps
 Description: Insert a Google Map to a page - Requires WPU Options & WPU Post Metas
-Version: 0.4.0
+Version: 0.5.0
 Author: Darklg
 Author URI: http://darklg.me/
 License: MIT License
@@ -11,10 +11,11 @@ License URI: http://opensource.org/licenses/MIT
 */
 
 class WPUInsertMaps {
-    private $version = '0.4.0';
+    private $version = '0.5.0';
+    private $post_types = array('post', 'page');
 
     public function __construct() {
-        add_action('plugins_loaded', array(&$this, 'load_translation'));
+        add_action('plugins_loaded', array(&$this, 'plugins_loaded'));
 
         /* Boxes */
         add_filter('wpu_options_tabs', array(&$this, 'set_wpu_options_tabs'), 10, 1);
@@ -31,8 +32,15 @@ class WPUInsertMaps {
         add_filter('the_content', array(&$this, 'load_map'));
     }
 
-    public function load_translation() {
+    public function plugins_loaded() {
+        /* Translation */
         load_plugin_textdomain('wpuinsertmaps', false, dirname(plugin_basename(__FILE__)) . '/lang/');
+        /* Post types */
+        $post_types = $this->post_types;
+        $this->post_types = apply_filters('wpuinsertmaps__post_types', $this->post_types);
+        if (!is_array($this->post_types)) {
+            $this->post_types = $post_types;
+        }
     }
 
     /* ----------------------------------------------------------
@@ -73,7 +81,7 @@ class WPUInsertMaps {
     public function set_wputh_post_metas_boxes($boxes) {
         $boxes['wpuinsertmaps__meta_box'] = array(
             'name' => __('WPU Insert map', 'wpuinsertmaps'),
-            'post_type' => array('post', 'page')
+            'post_type' => $this->post_types
         );
         return $boxes;
     }
@@ -125,7 +133,7 @@ class WPUInsertMaps {
     -------------------------- */
 
     public function add_theme_scripts() {
-        if (is_singular()) {
+        if (is_singular($this->post_types)) {
             wp_enqueue_style('wpuinsertmaps-style', plugins_url('assets/style.css', __FILE__), array(), $this->version);
             wp_enqueue_script('wpuinsertmaps-script', plugins_url('assets/script.js', __FILE__), array('jquery'), $this->version, true);
         }
@@ -135,7 +143,7 @@ class WPUInsertMaps {
     -------------------------- */
 
     public function load_apikey() {
-        if (is_singular()) {
+        if (is_singular($this->post_types)) {
             echo '<script src="https://maps.googleapis.com/maps/api/js?key=' . get_option('wpuinsertmaps__key') . '&callback=wpuinsertmaps_init"async defer></script>';
         }
     }
@@ -144,7 +152,7 @@ class WPUInsertMaps {
     -------------------------- */
 
     public function load_map($content) {
-        if (is_singular() && is_main_query() && get_post_meta(get_the_ID(), 'wpuinsertmaps__load_map', 1)) {
+        if (is_singular($this->post_types) && is_main_query() && get_post_meta(get_the_ID(), 'wpuinsertmaps__load_map', 1)) {
             $wpuinsertmaps__markers = json_encode(get_post_meta(get_the_ID(), 'wpuinsertmaps__markers', 1));
             $wpuinsertmaps__map_position = get_post_meta(get_the_ID(), 'wpuinsertmaps__map_position', 1);
             $content_map = '<div class="wpuinsertmaps-element" data-map="' . esc_attr($wpuinsertmaps__markers) . '"></div>';
