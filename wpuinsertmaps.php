@@ -3,7 +3,7 @@
 /*
 Plugin Name: WPU Insert Maps
 Description: Insert a Google Map to a page - Requires WPU Options & WPU Post Metas
-Version: 0.5.0
+Version: 0.6.0
 Author: Darklg
 Author URI: http://darklg.me/
 License: MIT License
@@ -11,16 +11,15 @@ License URI: http://opensource.org/licenses/MIT
 */
 
 class WPUInsertMaps {
-    private $version = '0.5.0';
+    private $version = '0.6.0';
     private $post_types = array('post', 'page');
+    private $settings_values = array();
 
     public function __construct() {
         add_action('plugins_loaded', array(&$this, 'plugins_loaded'));
+        add_action('init', array(&$this, 'init'));
 
         /* Boxes */
-        add_filter('wpu_options_tabs', array(&$this, 'set_wpu_options_tabs'), 10, 1);
-        add_filter('wpu_options_boxes', array(&$this, 'set_wpu_options_boxes'), 10, 1);
-        add_filter('wpu_options_fields', array(&$this, 'set_wputh_options_fields'), 10, 1);
         add_filter('wputh_post_metas_boxes', array(&$this, 'set_wputh_post_metas_boxes'), 10, 1);
         add_filter('wputh_post_metas_fields', array(&$this, 'set_wputh_post_metas_fields'), 10, 1);
 
@@ -43,37 +42,39 @@ class WPUInsertMaps {
         }
     }
 
+    public function init() {
+        $this->settings_details = array(
+            'plugin_id' => 'wpuinsertmaps',
+            'option_id' => 'wpuinsertmaps_options',
+            'plugin_name' => __('WPU Insert map', 'wpuinsertmaps'),
+            'create_page' => true,
+            'sections' => array(
+                'api' => array(
+                    'name' => __('API', 'wpuinsertmaps')
+                )
+            )
+        );
+        $this->settings = array(
+            'api_key' => array(
+                'label' => __('Maps API Key', 'wpuinsertmaps'),
+                'help' => sprintf(__('You can get an <a %s href="%s">API key here</a>', 'wpuinsertmaps'), 'target="_blank"', 'https://console.developers.google.com/apis/library/maps-backend.googleapis.com/?project=')
+            )
+        );
+
+        if (is_admin()) {
+            include dirname(__FILE__) . '/inc/WPUBaseMessages/WPUBaseMessages.php';
+            $this->messages = new \wpuinsertmaps\WPUBaseMessages($this->settings_details['plugin_id']);
+
+            include dirname(__FILE__) . '/inc/WPUBaseSettings/WPUBaseSettings.php';
+            new \wpuinsertmaps\WPUBaseSettings($this->settings_details, $this->settings);
+        }
+
+        $this->settings_values = $this->get_settings();
+    }
+
     /* ----------------------------------------------------------
       Admin
     ---------------------------------------------------------- */
-
-    /* Options
-    -------------------------- */
-
-    public function set_wpu_options_tabs($tabs) {
-        $tabs['wpuinsertmaps__tab'] = array(
-            'name' => __('WPU Insert map', 'wpuinsertmaps'),
-            'sidebar' => true // Load in sidebar
-        );
-        return $tabs;
-    }
-
-    public function set_wpu_options_boxes($boxes) {
-        $boxes['wpuinsertmaps__box'] = array(
-            'name' => __('Google Maps', 'wpuinsertmaps'),
-            'tab' => 'wpuinsertmaps__tab'
-        );
-        return $boxes;
-    }
-
-    public function set_wputh_options_fields($options) {
-        $options['wpuinsertmaps__key'] = array(
-            'label' => __('Maps API Key', 'wpuinsertmaps'),
-            'box' => 'wpuinsertmaps__box',
-            'help' => sprintf(__('You can get an <a %s href="%s">API key here</a>'), 'target="_blank"', 'https://console.developers.google.com/apis/library/maps-backend.googleapis.com/?project=')
-        );
-        return $options;
-    }
 
     /* Post metas
     -------------------------- */
@@ -144,7 +145,7 @@ class WPUInsertMaps {
 
     public function load_apikey() {
         if (is_singular($this->post_types)) {
-            echo '<script src="https://maps.googleapis.com/maps/api/js?key=' . get_option('wpuinsertmaps__key') . '&callback=wpuinsertmaps_init"async defer></script>';
+            echo '<script src="https://maps.googleapis.com/maps/api/js?key=' . $this->settings_values['api_key'] . '&callback=wpuinsertmaps_init"async defer></script>';
         }
     }
 
@@ -163,6 +164,25 @@ class WPUInsertMaps {
             }
         }
         return $content;
+    }
+
+    /* Get settings
+    -------------------------- */
+
+    public function get_settings() {
+        if (!isset($this->settings) || !is_array($this->settings)) {
+            return array();
+        }
+        $settings = get_option($this->settings_details['option_id']);
+        if (!is_array($settings)) {
+            $settings = array();
+        }
+        foreach ($this->settings as $key => $setting) {
+            if (!isset($settings[$key])) {
+                $settings[$key] = false;
+            }
+        }
+        return $settings;
     }
 
 }

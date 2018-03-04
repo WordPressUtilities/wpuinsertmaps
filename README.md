@@ -4,6 +4,6 @@
 
 * [x] Choose map position.
 * [x] Choose specific post types.
+* [x] Use option module instead of WPU Options.
 * [ ] Add autocomplete.
-* [ ] Use option module instead of WPU Options.
 * [ ] Gutemberg compatibility ?
